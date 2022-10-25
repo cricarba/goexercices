@@ -3,8 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
-
-	"github.com/cricarba/profilebackend/certificate"
+	"ggithub.com/cricarba/goexercices/certificate"
 )
 
 const basePath = "/api"

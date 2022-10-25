@@ -1,3 +1,3 @@
-module github.com/cricarba/profilebackend
+module github.com/cricarba/goexercices
 
-go 1.15
+go 1.19

@@ -8,13 +8,14 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-
-	"github.com/cricarba/profilebackend/cors"
+	"github.com/cricarba/goexercices/cors"
 )
 
-// SetupRoutes :
+// SetupRoutes : define path en route
 const productsPath = "products"
 
+
+//Define Routes set de basepath /api/
 func SetupRoutes(apiBasePath string) {
 	productListHandler := http.HandlerFunc(handleProducts)
 	productItemHandler := http.HandlerFunc(handleProduct)
@@ -22,9 +23,12 @@ func SetupRoutes(apiBasePath string) {
 	http.Handle(fmt.Sprintf("%s/%s/", apiBasePath, productsPath), cors.Middleware(productItemHandler))
 }
 
+
+//Routing for DELETE, GET/{0}, UPDATE
 func handleProduct(w http.ResponseWriter, r *http.Request) {
 	urlPathSegments := strings.Split(r.URL.Path, "products/")
 
+	//get certificateId from url segments
 	certificateId, err := strconv.Atoi(urlPathSegments[len(urlPathSegments)-1])
 
 	if err != nil {
@@ -86,6 +90,7 @@ func handleProduct(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ROUTING POST A GET 
 func handleProducts(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
@@ -96,6 +101,7 @@ func handleProducts(w http.ResponseWriter, r *http.Request) {
 		}
 		w.Header().Set("Content-Tye", "application/json")
 		w.Write(certiJson)
+		
 	case http.MethodPost:
 		var newCertificate certificates
 		bodyBytes, err := ioutil.ReadAll(r.Body)
