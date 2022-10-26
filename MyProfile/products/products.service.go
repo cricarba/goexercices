@@ -1,4 +1,4 @@
-package certificate
+package products
 
 import (
 	"encoding/json"
@@ -32,62 +32,64 @@ func SetupRoutes(apiBasePath string) {
 //Routing for DELETE, GET/{0}, UPDATE
 func handleProduct(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("PUT DELETE")
+	
 	urlPathSegments := strings.Split(r.URL.Path, "product/")
 
-	//get certificateId from url segments
-	certificateId, err := strconv.Atoi(urlPathSegments[len(urlPathSegments)-1])
+	//get productId from url segments
+	productId, err := strconv.Atoi(urlPathSegments[len(urlPathSegments)-1])
 
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	certificate := getProduct(certificateId)
+	productItem := getProduct(productId)
 
-	if certificate == nil {
+	if productItem == nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
 	switch r.Method {
 	case http.MethodGet:
-		certificateJson, err := json.Marshal(certificate)
+		//convertir a json un struc
+		productJson, err := json.Marshal(productItem)
 
 		fmt.Println(err)
-		fmt.Println(certificateJson)
+		fmt.Println(productJson)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 
 		w.Header().Set("Content-Tye", "application/json")
-		w.Write(certificateJson)
+		w.Write(productJson)
 	case http.MethodPut:
-		var updateCertificate certificates
+		var updateProduct product
 		bodyBytes, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 
 		}
-		err = json.Unmarshal(bodyBytes, &updateCertificate)
+		err = json.Unmarshal(bodyBytes, &updateProduct)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 
 		}
-		if updateCertificate.Id != certificateId {
+		if updateProduct.Id != productId {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 
 		}
 
-		addOrUpdateProduct(updateCertificate)
+		addOrUpdateProduct(updateProduct)
 
 		w.WriteHeader(http.StatusOK)
 		return
 	case http.MethodDelete:
-		removeProduct(certificateId)
+		removeProduct(productId)
 		return
 	case http.MethodOptions:
 		return
@@ -101,34 +103,45 @@ func handleProducts(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("GET O POST")
 	switch r.Method {
 	case http.MethodGet:
-		certificateList := getProductList()
-		certiJson, err := json.Marshal(certificateList)
+		fmt.Println("GET")
+		productList := getProductList()
+		productJson, err := json.Marshal(productList)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 		w.Header().Set("Content-Tye", "application/json")
-		w.Write(certiJson)
+		w.Write(productJson)
 
 	case http.MethodPost:
-		var newCertificate certificates
+		fmt.Println("POST")
+		var newproduct product
+		
 		bodyBytes, err := ioutil.ReadAll(r.Body)
+		
+		if err != nil {
+			
+			w.WriteHeader(http.StatusBadRequest)
+			
+			return
+
+		}
+		
+		err = json.Unmarshal(bodyBytes, &newproduct)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
+			fmt.Println("json")
 			return
 
 		}
-		err = json.Unmarshal(bodyBytes, &newCertificate)
-		if err != nil {
+
+		fmt.Println(newproduct)
+		if newproduct.Id != 0 {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 
 		}
-		if newCertificate.Id != 0 {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-
-		}
-		_, err = addOrUpdateProduct(newCertificate)
+		
+		_, err = addOrUpdateProduct(newproduct)
 		if err != nil {
 			log.Print(err)
 			w.WriteHeader(http.StatusBadRequest)

@@ -11,11 +11,12 @@ const basePath = "/api"
 
 func main() {
 	products.SetupRoutes(basePath)
-	fs := http.FileServer(http.Dir("./static/test.html")) // ccreamos el servidor de archivos
+	fs := http.FileServer(http.Dir("./static/")) // ccreamos el servidor de archivos
 
 	// cuando lleguen petidcion /static/ rediriga a el server de archivos
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
-
+    http.HandleFunc("/redirect", redirectPage)
+	http.HandleFunc("/error", errorPage)
     http.HandleFunc("/", home)// primer parametro url, SEGUNDO la funcion que se procesa
 	http.HandleFunc("/info/", getInfoRequest)
 	err := http.ListenAndServe(":8082", nil) // segundo parametro es una funcion que se llama cada vez que llegue una funcion puede ser un middleware
@@ -27,6 +28,16 @@ func main() {
 func home(w http.ResponseWriter, r *http.Request){
    w.Write([]byte("<html>Home</html>"))
 }
+
+func redirectPage(w http.ResponseWriter, r *http.Request){
+	http.Redirect(w, r, "/", 301)
+ }
+
+ 
+func errorPage(w http.ResponseWriter, r *http.Request){
+	http.Error(w,  "Error", 501)
+ }
+
 
 func getInfoRequest(w http.ResponseWriter, r *http.Request){
 	fmt.Fprintln(w, "Host: ",r.Host)

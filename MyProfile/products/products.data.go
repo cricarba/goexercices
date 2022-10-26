@@ -1,4 +1,4 @@
-package certificate
+package products
 
 import (
 	"encoding/json"
@@ -13,8 +13,8 @@ import (
 // used to hold our product list in memory
 var productMap = struct {
 	sync.RWMutex
-	m map[int]certificates
-}{m: make(map[int]certificates)}
+	m map[int]product
+}{m: make(map[int]product)}
 
 
 //este metodo se llama cuando se inicializa el package
@@ -28,7 +28,7 @@ func init() {
 	fmt.Printf("%d products loaded...\n", len(productMap.m))
 }
 
-func loadProductMap() (map[int]certificates, error) {
+func loadProductMap() (map[int]product, error) {
 	fileName := "certificates.json"
 	_, err := os.Stat(fileName)
 	if os.IsNotExist(err) {
@@ -36,19 +36,19 @@ func loadProductMap() (map[int]certificates, error) {
 	}
 
 	file, _ := ioutil.ReadFile(fileName)
-	productList := make([]certificates, 0)
+	productList := make([]product, 0)
 	err = json.Unmarshal([]byte(file), &productList)
 	if err != nil {
 		log.Fatal(err)
 	}
-	prodMap := make(map[int]certificates)
+	prodMap := make(map[int]product)
 	for i := 0; i < len(productList); i++ {
 		prodMap[productList[i].Id] = productList[i]
 	}
 	return prodMap, nil
 }
 
-func getProduct(productID int) *certificates {
+func getProduct(productID int) *product{
 	productMap.RLock()
 	defer productMap.RUnlock()
 	if product, ok := productMap.m[productID]; ok {
@@ -63,9 +63,9 @@ func removeProduct(productID int) {
 	delete(productMap.m, productID)
 }
 
-func getProductList() []certificates {
+func getProductList() []product {
 	productMap.RLock()
-	products := make([]certificates, 0, len(productMap.m))
+	products := make([]product, 0, len(productMap.m))
 	for _, value := range productMap.m {
 		products = append(products, value)
 	}
@@ -89,22 +89,22 @@ func getNextProductID() int {
 	return productIds[len(productIds)-1] + 1
 }
 
-func addOrUpdateProduct(product certificates) (int, error) {
+func addOrUpdateProduct(item product) (int, error) {
 	// if the product id is set, update, otherwise add
 	addOrUpdateID := -1
-	if product.Id > 0 {
-		oldProduct := getProduct(product.Id)
+	if item.Id > 0 {
+		oldProduct := getProduct(item.Id)
 		// if it exists, replace it, otherwise return error
 		if oldProduct == nil {
-			return 0, fmt.Errorf("product id [%d] doesn't exist", product.Id)
+			return 0, fmt.Errorf("product id [%d] doesn't exist", item.Id)
 		}
-		addOrUpdateID = product.Id
+		addOrUpdateID = item.Id
 	} else {
 		addOrUpdateID = getNextProductID()
-		product.Id = addOrUpdateID
+		item.Id = addOrUpdateID
 	}
 	productMap.Lock()
-	productMap.m[addOrUpdateID] = product
+	productMap.m[addOrUpdateID] = item
 	productMap.Unlock()
 	return addOrUpdateID, nil
 }
