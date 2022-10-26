@@ -16,6 +16,8 @@ var productMap = struct {
 	m map[int]certificates
 }{m: make(map[int]certificates)}
 
+
+//este metodo se llama cuando se inicializa el package
 func init() {
 	fmt.Println("loading products...")
 	prodMap, err := loadProductMap()

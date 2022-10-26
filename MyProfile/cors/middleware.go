@@ -2,10 +2,12 @@ package cors
 
 import (
 	"net/http"
+	"fmt"
 )
 
 // Middleware : intercept request and add headers
 func Middleware(handler http.Handler) http.Handler {
+	fmt.Println("Middelware de CORS")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Content-Type", "application/json")

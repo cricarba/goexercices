@@ -12,13 +12,18 @@ import (
 )
 
 // SetupRoutes : define path en route
-const productsPath = "products"
+const productsPath = "product"
 
 
 //Define Routes set de basepath /api/
 func SetupRoutes(apiBasePath string) {
+	fmt.Println("Disparo estas funciones para llenar la lista de productos")
+	//Disparo estas funciones para llenar la lista de productos
 	productListHandler := http.HandlerFunc(handleProducts)
 	productItemHandler := http.HandlerFunc(handleProduct)
+
+
+	// creo el ruteo para las peticiones a /api/products/ y ejecuto el middleware
 	http.Handle(fmt.Sprintf("%s/%s", apiBasePath, productsPath), cors.Middleware(productListHandler))
 	http.Handle(fmt.Sprintf("%s/%s/", apiBasePath, productsPath), cors.Middleware(productItemHandler))
 }
@@ -26,7 +31,8 @@ func SetupRoutes(apiBasePath string) {
 
 //Routing for DELETE, GET/{0}, UPDATE
 func handleProduct(w http.ResponseWriter, r *http.Request) {
-	urlPathSegments := strings.Split(r.URL.Path, "products/")
+	fmt.Println("PUT DELETE")
+	urlPathSegments := strings.Split(r.URL.Path, "product/")
 
 	//get certificateId from url segments
 	certificateId, err := strconv.Atoi(urlPathSegments[len(urlPathSegments)-1])
@@ -92,6 +98,7 @@ func handleProduct(w http.ResponseWriter, r *http.Request) {
 
 // ROUTING POST A GET 
 func handleProducts(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("GET O POST")
 	switch r.Method {
 	case http.MethodGet:
 		certificateList := getProductList()
@@ -101,7 +108,7 @@ func handleProducts(w http.ResponseWriter, r *http.Request) {
 		}
 		w.Header().Set("Content-Tye", "application/json")
 		w.Write(certiJson)
-		
+
 	case http.MethodPost:
 		var newCertificate certificates
 		bodyBytes, err := ioutil.ReadAll(r.Body)
