@@ -35,9 +35,9 @@ func handleProduct(w http.ResponseWriter, r *http.Request) {
 	
 	urlPathSegments := strings.Split(r.URL.Path, "product/")
 
-	//get productId from url segments
+	//get productId from url segments y convierte a entero Atoi
 	productId, err := strconv.Atoi(urlPathSegments[len(urlPathSegments)-1])
-
+    //prodId, ok := r.URL.Query()["id"] tomar los parametros del query string
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -55,7 +55,7 @@ func handleProduct(w http.ResponseWriter, r *http.Request) {
 		//convertir a json un struc
 		productJson, err := json.Marshal(productItem)
 
-		fmt.Println(err)
+		//fmt.Println(err)
 		fmt.Println(productJson)
 
 		if err != nil {
